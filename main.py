@@ -122,14 +122,39 @@ if st.button("Scrape Site"):
                     st.warning("⚠️ OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.")
                     st.info("To set your API key, run: export OPENAI_API_KEY='your-key-here'")
 
-                # Prompt input
+                # Example questions section
+                st.write("**💡 Example Questions You Can Ask:**")
+                example_cols = st.columns(2)
+                with example_cols[0]:
+                    st.markdown("""
+                    - What is this website about?
+                    - What are the main topics covered?
+                    - Summarize the key information
+                    - What services are offered?
+                    """)
+                with example_cols[1]:
+                    st.markdown("""
+                    - Extract contact information
+                    - What is the target audience?
+                    - List the main features
+                    - What makes this site unique?
+                    """)
+
+                # Prompt input with better styling
+                st.write("**📝 Your Question:**")
                 user_prompt = st.text_area(
                     "Enter your question about the website:",
-                    placeholder="e.g., What is this website about? What are the main topics covered? Summarize the key information.",
-                    height=100
+                    placeholder="Type your question here... For example: 'What is the main purpose of this website?'",
+                    height=100,
+                    label_visibility="collapsed"
                 )
 
-                if st.button("Analyze with AI"):
+                # Analyze button
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    analyze_button = st.button("🤖 Analyze with AI", use_container_width=True)
+
+                if analyze_button:
                     if not user_prompt:
                         st.warning("Please enter a question.")
                     elif not api_key:
@@ -139,8 +164,15 @@ if st.button("Scrape Site"):
                             analyzer = WebsiteAnalyzer(api_key)
                             response = analyzer.analyze_content(data, user_prompt)
 
-                        st.write("**AI Response:**")
-                        st.write(response)
+                        # Display response in a nice container
+                        st.divider()
+                        st.write("### 🎯 AI Response:")
+                        response_container = st.container(border=True)
+                        with response_container:
+                            st.write(response)
+
+                        # Add copy button for the response
+                        st.text_area("Copy response:", response, height=100, label_visibility="collapsed", disabled=True)
 
         except Exception as e:
             st.error(f"Error scraping website: {e}")
@@ -158,14 +190,39 @@ elif 'scraped_data' in st.session_state:
         st.warning("⚠️ OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.")
         st.info("To set your API key, run: export OPENAI_API_KEY='your-key-here'")
 
-    # Prompt input
+    # Example questions section
+    st.write("**💡 Example Questions You Can Ask:**")
+    example_cols = st.columns(2)
+    with example_cols[0]:
+        st.markdown("""
+        - What is this website about?
+        - What are the main topics covered?
+        - Summarize the key information
+        - What services are offered?
+        """)
+    with example_cols[1]:
+        st.markdown("""
+        - Extract contact information
+        - What is the target audience?
+        - List the main features
+        - What makes this site unique?
+        """)
+
+    # Prompt input with better styling
+    st.write("**📝 Your Question:**")
     user_prompt = st.text_area(
         "Enter your question about the website:",
-        placeholder="e.g., What is this website about? What are the main topics covered? Summarize the key information.",
-        height=100
+        placeholder="Type your question here... For example: 'What is the main purpose of this website?'",
+        height=100,
+        label_visibility="collapsed"
     )
 
-    if st.button("Analyze with AI"):
+    # Analyze button
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        analyze_button = st.button("🤖 Analyze with AI", use_container_width=True)
+
+    if analyze_button:
         if not user_prompt:
             st.warning("Please enter a question.")
         elif not api_key:
@@ -175,5 +232,41 @@ elif 'scraped_data' in st.session_state:
                 analyzer = WebsiteAnalyzer(api_key)
                 response = analyzer.analyze_content(st.session_state['scraped_data'], user_prompt)
 
-            st.write("**AI Response:**")
-            st.write(response)
+            # Display response in a nice container
+            st.divider()
+            st.write("### 🎯 AI Response:")
+            response_container = st.container(border=True)
+            with response_container:
+                st.write(response)
+
+            # Add copy button for the response
+            st.text_area("Copy response:", response, height=100, label_visibility="collapsed", disabled=True)
+
+# No data scraped yet - show welcome UI
+else:
+    st.markdown("### 👋 Welcome to AI Web Scraper")
+
+    st.info("📌 **How to use:** Enter a URL above and click 'Scrape Site' to extract structured data from any website.")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("""
+        #### ✨ Features
+        - 🔍 Extract text, links, and images
+        - 📊 View structured data in tabs
+        - 💾 Download as JSON
+        - 🤖 AI-powered analysis
+        """)
+
+    with col2:
+        st.markdown("""
+        #### 🎯 Use Cases
+        - Research websites
+        - Extract contact info
+        - Analyze competitors
+        - Content summarization
+        """)
+
+    st.divider()
+    st.markdown("##### 🚀 Ready to start? Enter a URL above to begin scraping!")
