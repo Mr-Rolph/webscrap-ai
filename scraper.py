@@ -1,51 +1,41 @@
-import html
 import time
-import selenium.webdriver as webdriver
+from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import WebDriverException
+
 
 def scrape_website(website_url):
+    """Launch Chrome, navigate to website_url and return page HTML."""
     print("Launching Browser...")
 
-    chrome_driver_path = "./Google Chrome For Testing"  # Update this path as necessary
-    options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(service=Service(chrome_driver_path), options=options)
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-    import html
-    import time
-    import selenium.webdriver as webdriver
-    from selenium.webdriver.chrome.service import Service
+    driver = None
+    try:
+        try:
+            driver = webdriver.Chrome(options=options)
+        except WebDriverException:
+            from webdriver_manager.chrome import ChromeDriverManager
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=options)
 
+        driver.get(website_url)
+        print("Website loaded successfully.")
 
-    def scrape_website(website_url):
-        print("Launching Browser...")
+        time.sleep(3)
 
-        chrome_driver_path = "./Google Chrome For Testing"  # Update this path as necessary
-        options = webdriver.ChromeOptions()
-        driver = webdriver.Chrome(service=Service(chrome_driver_path), options=options)
+        html_content = driver.page_source
+        return html_content
 
-        import html
-        import time
-        import selenium.webdriver as webdriver
-        from selenium.webdriver.chrome.service import Service
-
-
-        def scrape_website(website_url):
-            """Launch Chrome, navigate to website_url and return page HTML.
-
-            Note: update chrome_driver_path to the exact chromedriver binary path.
-            """
-            print("Launching Browser...")
-
-            chrome_driver_path = "./Google Chrome For Testing"  # Update this path as necessary
-            options = webdriver.ChromeOptions()
-            driver = webdriver.Chrome(service=Service(chrome_driver_path), options=options)
-
-            try:
-                driver.get(website_url)
-                print("Website loaded successfully.")
-                html_content = driver.page_source
-                time.sleep(10)  # Wait for dynamic content to load
-
-                return html_content
-            finally:
-                driver.quit()
+    except Exception as e:
+        print(f"Error during scraping: {e}")
+        raise
+    finally:
+        if driver:
+            driver.quit()
